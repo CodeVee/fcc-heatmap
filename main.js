@@ -248,6 +248,80 @@ const processData = async () => {
      .text('Years')
      .style('text-anchor', 'middle')
      .attr('transform', 'translate(' + width / 2 + ',' + 3 * fontSize + ')');
+
+    const legendColors = colorbrewer.RdYlBu[11].reverse();
+    const legendWidth = 400;
+    const legendHeight = 300 / legendColors.length;
+
+    const variance = data.monthlyVariance.map(val => val.variance);
+    const minTemp = data.baseTemperature + Math.min.apply(null, variance);
+    const maxTemp = data.baseTemperature + Math.max.apply(null, variance);
+ 
+    const legendThreshold = d3.scale
+       .threshold()
+       .domain(
+         ((min, max, count) => {
+           const array = [];
+           const step = (max - min) / count;
+           const base = min;
+           for (var i = 1; i < count; i++) {
+             array.push(base + i * step);
+           }
+           return array;
+         })(minTemp, maxTemp, legendColors.length)
+       )
+       .range(legendColors);
+
+    const legendX = d3.scale
+       .linear()
+       .domain([minTemp, maxTemp])
+       .range([0, legendWidth]);
+ 
+    const legendXAxis = d3.svg
+       .axis()
+       .scale(legendX)
+       .orient('bottom')
+       .tickSize(10, 0)
+       .tickValues(legendThreshold.domain())
+       .tickFormat(d3.format('.1f'));
+ 
+    const legend = svg
+       .append('g')
+       .classed('legend', true)
+       .attr('id', 'legend')
+       .attr(
+         'transform',
+         `translate(${padding.left}, ${padding.top + height + padding.bottom - 2 * legendHeight})`
+       );
+ 
+     legend
+       .append('g')
+       .selectAll('rect')
+       .data(
+         legendThreshold.range().map(function (color) {
+           const d = legendThreshold.invertExtent(color);
+           if (d[0] === null) d[0] = legendX.domain()[0];
+           
+           if (d[1] === null) d[1] = legendX.domain()[1];
+           
+           return d;
+         })
+       )
+       .enter()
+       .append('rect')
+       .style('fill', d => legendThreshold(d[0]))
+       .attr({
+         x: d => legendX(d[0]),
+         y: 0,
+         width: d => legendX(d[1]) - legendX(d[0]),
+         height: legendHeight
+       });
+ 
+     legend
+       .append('g')
+       .attr('transform', `translate(0, ${legendHeight})`)
+       .call(legendXAxis);
+ 
 }
 
 processData();
