@@ -196,15 +196,12 @@ const processData = async () => {
      .append('g')
      .classed('y-axis', true)
      .attr('id', 'y-axis')
-     .attr('transform', 'translate(' + padding.left + ',' + padding.top + ')')
+     .attr('transform', `translate(${padding.left}, ${padding.top})`)
      .call(yAxis)
      .append('text')
      .text('Months')
      .style('text-anchor', 'middle')
-     .attr(
-       'transform',
-       'translate(' + -7 * fontSize + ',' + height / 2 + ')' + 'rotate(-90)'
-     );
+     .attr('transform', `translate(${-7 * fontSize}, ${height / 2})rotate(-90)`);
 
     const xScale = d3.scale
      .ordinal()
@@ -227,15 +224,12 @@ const processData = async () => {
      .append('g')
      .classed('x-axis', true)
      .attr('id', 'x-axis')
-     .attr(
-       'transform',
-       'translate(' + padding.left + ',' + (height + padding.top) + ')'
-     )
+     .attr('transform', `translate(${padding.left}, ${height + padding.top})`)
      .call(xAxis)
      .append('text')
      .text('Years')
      .style('text-anchor', 'middle')
-     .attr('transform', 'translate(' + width / 2 + ',' + 3 * fontSize + ')');
+     .attr('transform', `translate(${width / 2}, ${3 * fontSize})`);
 
     const legendColors = colorbrewer.RdYlBu[11].reverse();
     const legendWidth = 400;
@@ -277,10 +271,7 @@ const processData = async () => {
        .append('g')
        .classed('legend', true)
        .attr('id', 'legend')
-       .attr(
-         'transform',
-         `translate(${padding.left}, ${padding.top + height + padding.bottom - 2 * legendHeight})`
-       );
+       .attr('transform', `translate(${padding.left}, ${padding.top + height + padding.bottom - 2 * legendHeight})`);
  
     legend
        .append('g')
@@ -329,7 +320,7 @@ const processData = async () => {
          height: d => yScale.rangeBand(d.month)
        })
        .attr('fill', d => legendThreshold(data.baseTemperature + d.variance))
-       .on('mouseover', (e, d) => {
+       .on('mouseover', d => {
         const date = new Date(d.year, d.month);
         const str =
         `
