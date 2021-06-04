@@ -294,7 +294,7 @@ const processData = async () => {
          `translate(${padding.left}, ${padding.top + height + padding.bottom - 2 * legendHeight})`
        );
  
-     legend
+    legend
        .append('g')
        .selectAll('rect')
        .data(
@@ -317,10 +317,42 @@ const processData = async () => {
          height: legendHeight
        });
  
-     legend
+    legend
        .append('g')
        .attr('transform', `translate(0, ${legendHeight})`)
        .call(legendXAxis);
+
+    svg
+       .append('g')
+       .classed('map', true)
+       .attr('transform', `translate(${padding.left}, ${padding.top})`)
+       .selectAll('rect')
+       .data(data.monthlyVariance)
+       .enter()
+       .append('rect')
+       .attr('class', 'cell')
+       .attr('data-month', d => d.month)
+       .attr('data-year', d => d.year)
+       .attr('data-temp', d => data.baseTemperature + d.variance)
+       .attr({
+         x: d => xScale(d.year),
+         y: d => yScale(d.month),
+         width: d => xScale.rangeBand(d.year),
+         height: d => yScale.rangeBand(d.month)
+       })
+       .attr('fill', d => legendThreshold(data.baseTemperature + d.variance))
+       .on('mouseover', (e, d) => {
+        const date = new Date(d.year, d.month);
+        const str =
+        `
+        <span class='date'>${d3.time.format('%Y - %B')(date)}</span><br />
+        <span class='temperature'>${d3.format('.1f')(data.baseTemperature + d.variance)} &#8451;</span><br />
+        <span class='variance'>${d3.format('+.1f')(d.variance)}&#8451;</span>
+        `;
+        tip.attr('data-year', d.year);
+        tip.show(str);
+       })
+       .on('mouseout', tip.hide);
  
 }
 
