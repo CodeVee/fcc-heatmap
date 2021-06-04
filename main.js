@@ -186,6 +186,68 @@ const processData = async () => {
         height: height + padding.top + padding.bottom
       })
       .call(tip);
+
+    const yScale = d3.scale
+     .ordinal()
+     .domain([0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11])
+     .rangeRoundBands([0, height], 0, 0);
+
+    const yAxis = d3.svg
+     .axis()
+     .scale(yScale)
+     .tickValues(yScale.domain())
+     .tickFormat(month => {
+       var date = new Date(0);
+       date.setUTCMonth(month);
+       return d3.time.format.utc('%B')(date);
+     })
+     .orient('left')
+     .tickSize(10, 1);
+
+   svg
+     .append('g')
+     .classed('y-axis', true)
+     .attr('id', 'y-axis')
+     .attr('transform', 'translate(' + padding.left + ',' + padding.top + ')')
+     .call(yAxis)
+     .append('text')
+     .text('Months')
+     .style('text-anchor', 'middle')
+     .attr(
+       'transform',
+       'translate(' + -7 * fontSize + ',' + height / 2 + ')' + 'rotate(-90)'
+     );
+
+    const xScale = d3.scale
+     .ordinal()
+     .domain(data.monthlyVariance.map(val => val.year))
+     .rangeRoundBands([0, width], 0, 0);
+
+    const xAxis = d3.svg
+     .axis()
+     .scale(xScale)
+     .tickValues(xScale.domain().filter(year => year % 10 === 0))
+     .tickFormat(year => {
+       var date = new Date(0);
+       date.setUTCFullYear(year);
+       return d3.time.format.utc('%Y')(date);
+     })
+     .orient('bottom')
+     .tickSize(10, 1);
+
+   svg
+     .append('g')
+     .classed('x-axis', true)
+     .attr('id', 'x-axis')
+     .attr(
+       'transform',
+       'translate(' + padding.left + ',' + (height + padding.top) + ')'
+     )
+     .call(xAxis)
+     .append('text')
+     .text('Years')
+     .style('text-anchor', 'middle')
+     .attr('transform', 'translate(' + width / 2 + ',' + 3 * fontSize + ')');
 }
 
 processData();
