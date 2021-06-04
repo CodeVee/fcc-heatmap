@@ -161,6 +161,31 @@ const processData = async () => {
         : base temperature ${data.baseTemperature} &#8451;
         `
       );
+
+    const fontSize = 16;
+    const width = 5 * Math.ceil(data.monthlyVariance.length / 12);
+    const height = 33 * 12;
+    const padding = {
+      left: 9 * fontSize,
+      right: 9 * fontSize,
+      top: 1 * fontSize,
+      bottom: 8 * fontSize
+    };
+    const tip = d3
+      .tip()
+      .attr('class', 'd3-tip')
+      .attr('id', 'tooltip')
+      .html(d => d)
+      .direction('n')
+      .offset([-10, 0]);
+
+    const svg = section
+      .append('svg')
+      .attr({
+        width: width + padding.left + padding.right,
+        height: height + padding.top + padding.bottom
+      })
+      .call(tip);
 }
 
 processData();
